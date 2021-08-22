@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  db:
+    image: mariadb:10
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${MATOMO_DATABASE_DBNAME}
+      MARIADB_USER: ${MATOMO_DATABASE_USERNAME}
+      MARIADB_PASSWORD: ${MATOMO_DATABASE_PASSWORD}
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    cap_add:
+      # https://stackoverflow.com/a/55706057/2736233
+      - SYS_NICE
+
+  app:
+    image: matomo:4-apache
+    restart: always
+    environment:
+      MATOMO_DATABASE_ADAPTER: mysql
+      MATOMO_DATABASE_HOST: db
+      MATOMO_DATABASE_DBNAME: ${MATOMO_DATABASE_DBNAME}
+      MATOMO_DATABASE_USERNAME: ${MATOMO_DATABASE_USERNAME}
+      MATOMO_DATABASE_PASSWORD: ${MATOMO_DATABASE_PASSWORD}
+      MATOMO_DATABASE_TABLES_PREFIX: ""
+    ports:
+      - 9000:80
+    volumes:
+      - matomo-data:/var/www/html
+    depends_on:
+      - db
+
+volumes:
+  mariadb-data:
+  matomo-data:
