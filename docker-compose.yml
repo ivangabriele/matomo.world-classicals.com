@@ -2,6 +2,7 @@ version: "3.9"
 
 services:
   db:
+    container_name: matomo_db
     image: mariadb:10
     restart: always
     environment:
@@ -16,7 +17,8 @@ services:
       - SYS_NICE
 
   app:
-    image: matomo:4-apache
+    container_name: matomo_app
+    image: matomo:4
     restart: always
     environment:
       MATOMO_DATABASE_ADAPTER: mysql
@@ -25,8 +27,9 @@ services:
       MATOMO_DATABASE_USERNAME: ${MATOMO_DATABASE_USERNAME}
       MATOMO_DATABASE_PASSWORD: ${MATOMO_DATABASE_PASSWORD}
       MATOMO_DATABASE_TABLES_PREFIX: ""
-    ports:
-      - 9000:80
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+    expose:
+      - 80
     volumes:
       - matomo-data:/var/www/html
     depends_on:
@@ -35,3 +38,8 @@ services:
 volumes:
   mariadb-data:
   matomo-data:
+
+networks:
+  default:
+    external:
+      name: proxy
