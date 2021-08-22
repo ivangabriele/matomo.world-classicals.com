@@ -5,3 +5,7 @@ backup:
 restore:
 	@echo "Restoring databases..."
 	./scripts/restore.sh
+
+start:
+	@echo "Starting application..."
+	./scripts/start.sh
